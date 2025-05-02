@@ -148,7 +148,7 @@ def contains_duplicate(nums):
 #* 5. Think “Have I seen this before?” at each step—that’s the essence of duplicate detection.
 
 # ============================================
-#? 🧠 Daily Temperatures (Medium) - Stack - Time: O(n), Space: O(n)
+#? 🧠 739.  Daily Temperatures (Medium) - Stack - Time: O(n), Space: O(n)
 # ============================================
 #! Problem:
 #!   Given a list of daily temperatures, return a list such that for each day,
@@ -176,35 +176,55 @@ def daily_temperatures(temperatures):
 #* 1. Think of the stack as "waiting for a warmer day" → we resolve it when a warmer day arrives.
 #* 2. Stack holds indices, not values.
 #* 3. A monotonically decreasing stack means you’ll only scan each temp once → O(n).
-
 # ============================================
-#? 🧠 Asteroid Collision (Medium) - Stack - Time: O(n), Space: O(n)
+#? 🧠 735. Asteroid Collision (Medium) - Stack - Time: O(n), Space: O(n)
 # ============================================
-#! Problem:
-#!   Given a list of asteroids moving left/right (positive = right, negative = left),
-#!   determine the state after all collisions. Same size = both explode. Larger survives.
-#! Example:
-#!   asteroids = [5,10,-5]  -> [5,10]
-#!   asteroids = [8,-8]    -> []
-#!   asteroids = [10,2,-5] -> [10]
-#! Key Idea:
-#!   Use a stack to simulate what happens as each asteroid enters.
-#!   Only collision happens when current asteroid is moving left (< 0) and stack top is right (> 0)
 
 #* Approach:
-#? Create a stack
-#? Iterate over the input
-#? while we have a collision between the top of the stack and the current asteroid we need to either:
-#? if current asteroid is bigger than top of stack pop the stack
-#? if top of the stack is bigger set current asteroid to null so we don't add it to the stack
-#? if they're both the same size,pop the stack and set the curr asteroid to null so we don't add it later
-#? if no collision then push on the curr asteroid
-#? Return the stack at the end
+#? Create an empty stack  
+#? Iterate through each asteroid `a` in `asteroids`:
+#?   • While stack not empty AND `a < 0 < stack[-1]` (a left-moving meets a right-moving):
+#?       – If `abs(a) > stack[-1]`: pop stack (the new asteroid destroys the top), then continue checking  
+#?       – Else if `abs(a) == stack[-1]`: pop stack (both explode), set `a = None`, break  
+#?       – Else: set `a = None`, break  (the new asteroid is destroyed)  
+#?   • After resolving collisions, if `a` survived (`a is not None`), push it onto stack  
+#? Return the stack of survivors
 
+#! Problem:
+#!   Given a list of integers `asteroids` where each element represents the size and direction
+#!   of an asteroid (positive = moving right, negative = moving left), compute the state
+#!   of the asteroids after all collisions. When two asteroids collide, the smaller one explodes;
+#!   if they are the same size, both explode.
+#! Examples:
+#!   asteroids = [5, 10, -5]    → [5, 10]
+#!   asteroids = [8, -8]        → []
+#!   asteroids = [10, 2, -5]    → [10]
+
+#! Key Idea:
+#!   Use a stack to keep track of surviving asteroids.  
+#!   Push right-moving asteroids immediately.  
+#!   For left-moving asteroids, resolve collisions against the stack’s top until no more apply.
+
+#! Pseudocode:
+#!   stack = []
+#!   for a in asteroids:
+#!     while stack AND a < 0 < stack[-1]:
+#!       if abs(a) > stack[-1]:
+#!         pop(stack)           # a destroys stack[-1]
+#!         continue              # keep checking
+#!       elif abs(a) == stack[-1]:
+#!         pop(stack)           # both explode
+#!         a = None
+#!         break
+#!       else:
+#!         a = None             # a is destroyed
+#!         break
+#!     if a is not None:
+#!       push(stack, a)
+#!   return stack
 
 def asteroid_collision(asteroids):
     stack = []
-
     for a in asteroids:
         while stack and a < 0 < stack[-1]:
             if stack[-1] < -a:
@@ -218,7 +238,6 @@ def asteroid_collision(asteroids):
     return stack
 
 #* Hints:
-#* 1. Only asteroids going in opposite directions may collide.
-#* 2. Use a stack to simulate right-moving asteroids, and resolve left-moving ones on the fly.
-#* 3. Continue popping if the incoming asteroid destroys others in its path.
-
+#* 1. Only opposite‐direction asteroids collide (left vs. right).
+#* 2. Use `abs(a)` to compare sizes, ignoring sign.
+#* 3. The `while` loop handles chain reactions until the new asteroid either is destroyed or no more collisions occur.
