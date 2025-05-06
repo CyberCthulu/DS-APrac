@@ -109,7 +109,102 @@ def length_of_longest_substring(s):
 #* 1. Maintain a sliding window with left/right pointers so the window always has unique chars.
 #* 2. When a duplicate is found within the window, jump left past its previous index.
 #* 3. Store last seen positions in a map to adjust the window in O(1) time.
+# ============================================
+#? 🧠 54. Spiral Matrix (Medium) – Time: O(m·n), Space: O(1) extra (ignoring output)  
+# ============================================
 
+#* Approach:
+#? Maintain four “walls” or boundaries—top, bottom, left, right—initially spanning the whole matrix.  
+#? Repeatedly traverse:
+#?   1. → from left to right along the top row, then increment top  
+#?   2. ↓ from top to bottom along the right column, then decrement right  
+#?   3. ← from right to left along the bottom row (if top ≤ bottom), then decrement bottom  
+#?   4. ↑ from bottom to top along the left column (if left ≤ right), then increment left  
+#? Stop once top > bottom or left > right.  
+#? Append each visited element to your result list in order.
+
+#! Problem:
+#!   Given an m×n matrix, return all its elements in “spiral” order, starting at the top-left
+#!   corner and proceeding rightward, then down, then left, then up, and so on, shrinking the
+#!   boundaries each time.
+#! Example:
+#!   matrix = [
+#!     [1, 2, 3],
+#!     [4, 5, 6],
+#!     [7, 8, 9]
+#!   ]
+#!   Output → [1,2,3,6,9,8,7,4,5]
+
+#! Key Idea:
+#!   By keeping four pointers (top, bottom, left, right), you can peel the matrix in
+#!   layers—each loop around visits the outer “ring” and then you move the boundaries inward.
+
+#! Pseudocode:
+#!   result = []
+#!   top, bottom = 0, m-1
+#!   left, right = 0, n-1
+#!   while top ≤ bottom AND left ≤ right:
+#!     # 1) left→right on top row
+#!     for col in left..right:
+#!       result.append(matrix[top][col])
+#!     top += 1
+#!
+#!     # 2) top→bottom on right column
+#!     for row in top..bottom:
+#!       result.append(matrix[row][right])
+#!     right -= 1
+#!
+#!     # 3) right→left on bottom row (if still valid)
+#!     if top ≤ bottom:
+#!       for col in right..left step -1:
+#!         result.append(matrix[bottom][col])
+#!       bottom -= 1
+#!
+#!     # 4) bottom→top on left column (if still valid)
+#!     if left ≤ right:
+#!       for row in bottom..top step -1:
+#!         result.append(matrix[row][left])
+#!       left += 1
+#!
+#!   return result
+
+def spiral_order(matrix):
+    if not matrix: 
+        return []
+    result = []
+    top, bottom = 0, len(matrix) - 1
+    left, right = 0, len(matrix[0]) - 1
+
+    while top <= bottom and left <= right:
+        # 1) traverse left→right
+        for col in range(left, right + 1):
+            result.append(matrix[top][col])
+        top += 1
+
+        # 2) traverse top→bottom
+        for row in range(top, bottom + 1):
+            result.append(matrix[row][right])
+        right -= 1
+
+        # 3) traverse right→left
+        if top <= bottom:
+            for col in range(right, left - 1, -1):
+                result.append(matrix[bottom][col])
+            bottom -= 1
+
+        # 4) traverse bottom→top
+        if left <= right:
+            for row in range(bottom, top - 1, -1):
+                result.append(matrix[row][left])
+            left += 1
+
+    return result
+
+#* Hints:
+#* 1. Visualize peeling an onion—each “ring” is one loop of four traversals.  
+#* 2. Always update your boundary pointers immediately after traversing that edge.  
+#* 3. Guard the bottom and left passes with “if” checks so you don’t double-visit in odd-sized matrices.  
+#* 4. This runs in O(m·n) because you visit each cell exactly once and use O(1) extra space.  
 # ============================================
 #? 🧠 217. Contains Duplicate (Easy) - Time: O(n), Space: O(n)
 # ============================================
