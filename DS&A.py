@@ -204,7 +204,101 @@ def spiral_order(matrix):
 #* 1. Visualize peeling an onion—each “ring” is one loop of four traversals.  
 #* 2. Always update your boundary pointers immediately after traversing that edge.  
 #* 3. Guard the bottom and left passes with “if” checks so you don’t double-visit in odd-sized matrices.  
-#* 4. This runs in O(m·n) because you visit each cell exactly once and use O(1) extra space.  
+#* 4. This runs in O(m·n) because you visit each cell exactly once and use O(1) extra space.
+# ============================================
+#? 🧠 76. Minimum Window Substring (Hard) – Time: O(|S| + |T|), Space: O(𝑘) where 𝑘 is distinct chars in T
+# ============================================
+#* Approach:
+#? Use the “sliding window” + frequency map technique:
+#? 1. Build a map `need` of character → count for string T.
+#? 2. Expand a right pointer over S, decrementing `need[c]` when you include a needed char.
+#?    • Track `formed` = how many unique chars have met their required count.
+#? 3. Once `formed == required` (all T’s chars covered), try to contract from the left:
+#?    • Move left forward, and for each char d you remove, increment `need[d]`.  
+#?    • If `need[d]` becomes > 0, you’ve lost a required char → decrement `formed` → stop contracting.
+#?    • Record the smallest window seen so far.
+#? 4. Continue expanding right and contracting left until right reaches end of S.
+#? Return the best window substring or `""` if none.
+
+#! Problem:
+#!   Given strings S and T, find the smallest substring of S which contains all chars of T (including multiplicity).
+#!   If no such window exists, return the empty string.
+#! Examples:
+#!   S = "ADOBECODEBANC", T = "ABC"  → "BANC"
+#!   S = "a", T = "a"                → "a"
+#!   S = "a", T = "aa"               → ""
+
+#! Key Idea:
+#!   Maintain a dynamic window [l, r] over S.  
+#!   Expand r to include required chars, then shrink l to drop extras, tracking the minimum window that still covers T.
+
+#! Pseudocode:
+#!   if len(S) < len(T): return ""
+#!   need = Counter(T)
+#!   required = number of keys in need
+#!   formed = 0
+#!   l = 0
+#!   best = (inf, None, None)  # length, left, right
+#!   window_counts = default 0
+#!
+#!   for r in 0..len(S)-1:
+#!     c = S[r]
+#!     window_counts[c] += 1
+#!     if c in need and window_counts[c] == need[c]:
+#!       formed += 1
+#!
+#!     while l <= r and formed == required:
+#!       # update best if smaller
+#!       if (r-l+1) < best.length:
+#!         best = (r-l+1, l, r)
+#!       d = S[l]
+#!       window_counts[d] -= 1
+#!       if d in need and window_counts[d] < need[d]:
+#!         formed -= 1
+#!       l += 1
+#!
+#!   return "" if best.length == inf else S[best.left : best.right+1]
+
+from collections import Counter, defaultdict
+
+def min_window(s: str, t: str) -> str:
+    if len(s) < len(t):
+        return ""
+    need = Counter(t)
+    window_counts = defaultdict(int)
+    required = len(need)
+    formed = 0
+    l = 0
+    best_len = float("inf")
+    best_l = 0
+
+    for r, char in enumerate(s):
+        window_counts[char] += 1
+        if char in need and window_counts[char] == need[char]:
+            formed += 1
+
+        # Try and contract the window till it ceases to be 'desirable'
+        while l <= r and formed == required:
+            # Update best window
+            window_size = r - l + 1
+            if window_size < best_len:
+                best_len = window_size
+                best_l = l
+
+            # Remove from left
+            left_char = s[l]
+            window_counts[left_char] -= 1
+            if left_char in need and window_counts[left_char] < need[left_char]:
+                formed -= 1
+            l += 1
+
+    return "" if best_len == float("inf") else s[best_l: best_l + best_len]
+
+#* Hints:
+#* 1. Use two maps: `need` for T’s requirements, and `window_counts` for current window in S.
+#* 2. `formed` tracks how many distinct chars have met their target frequency.
+#* 3. Expand the window (right++) until it’s valid, then contract (left++) to find the smallest valid window.
+#* 4. Time is O(|S| + |T|) because each pointer moves at most |S| times; space is O(𝑘), with k distinct chars in T.
 # ============================================
 #? 🧠 217. Contains Duplicate (Easy) - Time: O(n), Space: O(n)
 # ============================================
