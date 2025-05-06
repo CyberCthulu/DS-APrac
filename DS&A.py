@@ -110,6 +110,44 @@ def length_of_longest_substring(s):
 #* 2. When a duplicate is found within the window, jump left past its previous index.
 #* 3. Store last seen positions in a map to adjust the window in O(1) time.
 # ============================================
+#? 🧠 53. Maximum Subarray (Easy) – Time: O(n), Space: O(1)
+# ============================================
+#* Approach:
+#? Use Kadane’s algorithm:
+#?   • Maintain two variables: 
+#?       current_sum = max subarray ending here
+#?       max_sum     = best subarray seen so far
+#?   • For each num in nums:
+#?       current_sum = max(num, current_sum + num)
+#?       max_sum     = max(max_sum, current_sum)
+#
+#! Problem:
+#!   Given an integer array `nums`, find the contiguous subarray with the largest sum and return its sum.
+#! Example:
+#!   nums = [-2,1,-3,4,-1,2,1,-5,4] → 6   (subarray [4, -1, 2, 1])
+#
+#! Key Idea:
+#!   Decide at each step whether to extend the existing subarray or start fresh at the current element.
+#
+#! Pseudocode:
+#!   current_sum = max_sum = nums[0]
+#!   for num in nums[1:]:
+#!       current_sum = max(num, current_sum + num)
+#!       max_sum     = max(max_sum, current_sum)
+#!   return max_sum
+#
+def max_subarray(nums):
+    current_sum = max_sum = nums[0]
+    for num in nums[1:]:
+        current_sum = max(num, current_sum + num)
+        max_sum     = max(max_sum, current_sum)
+    return max_sum
+
+#* Hints:
+#* 1. If current_sum drops below 0, starting anew at the next element is optimal.
+#* 2. Only two variables → O(1) extra space.
+#* 3. Single pass through array → O(n) time.
+# ============================================
 #? 🧠 54. Spiral Matrix (Medium) – Time: O(m·n), Space: O(1) extra (ignoring output)  
 # ============================================
 
@@ -300,6 +338,44 @@ def min_window(s: str, t: str) -> str:
 #* 3. Expand the window (right++) until it’s valid, then contract (left++) to find the smallest valid window.
 #* 4. Time is O(|S| + |T|) because each pointer moves at most |S| times; space is O(𝑘), with k distinct chars in T.
 # ============================================
+#? 🧠 198. House Robber (Easy) – Time: O(n), Space: O(1)
+# ============================================
+#* Approach:
+#? Use a rolling-DP with two variables:
+#?   prev2 = max loot up to house i-2
+#?   prev1 = max loot up to house i-1
+#? For each house value v:
+#?   current = max(prev1, prev2 + v)
+#?   prev2, prev1 = prev1, current
+#
+#! Problem:
+#!   Given a list of non-negative integers `nums` representing money at each house,
+#!   return the maximum amount you can rob without robbing two adjacent houses.
+#! Example:
+#!   nums = [1,2,3,1] → 4   (rob houses 1 and 3)
+#
+#! Key Idea:
+#!   At each house, choose to skip it (keep prev1) or rob it (prev2 + current house).
+#
+#! Pseudocode:
+#!   prev2 = prev1 = 0
+#!   for v in nums:
+#!       current = max(prev1, prev2 + v)
+#!       prev2, prev1 = prev1, current
+#!   return prev1
+#
+def rob(nums):
+    prev2 = prev1 = 0
+    for v in nums:
+        current    = max(prev1, prev2 + v)
+        prev2, prev1 = prev1, current
+    return prev1
+
+#* Hints:
+#* 1. prev1 tracks best up to the previous house; prev2 up to two before.
+#* 2. Rolling variables avoid an O(n) array → O(1) space.
+#* 3. Each house is processed once → O(n) time.
+# ============================================
 #? 🧠 217. Contains Duplicate (Easy) - Time: O(n), Space: O(n)
 # ============================================
 #! Problem:
@@ -430,3 +506,77 @@ def asteroid_collision(asteroids):
 #* 1. Only opposite‐direction asteroids collide (left vs. right).
 #* 2. Use `abs(a)` to compare sizes, ignoring sign.
 #* 3. The `while` loop handles chain reactions until the new asteroid either is destroyed or no more collisions occur.
+# ============================================
+#? 🧠 200. Number of Islands (Medium) – Time: O(m·n), Space: O(m·n) worst-case recursion/stack
+# ============================================
+
+#* Approach:
+#? Treat the grid as a graph of water (‘0’) and land (‘1’).  
+#? Iterate every cell; when you find a ‘1’, that’s a new island—increment count, then “sink” that island:
+#?   • Use DFS (or BFS) from that cell to visit all connected ‘1’s (up/down/left/right), marking them ‘0’  
+#?   • This prevents recounting the same island  
+#? Continue scanning the grid until all cells are visited.  
+
+#! Problem:
+#!   Given a 2D grid of ‘1’s (land) and ‘0’s (water), count the number of islands.
+#!   An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically.
+#! Example:
+#!   grid = [
+#!     ["1","1","0","0","0"],
+#!     ["1","1","0","0","0"],
+#!     ["0","0","1","0","0"],
+#!     ["0","0","0","1","1"]
+#!   ]
+#!   Output → 3
+
+#! Key Idea:
+#!   Each time you discover an unvisited land cell, you perform a flood-fill (DFS/BFS) to mark the entire island,
+#!   so you only count it once.
+
+#! Pseudocode:
+#!   if grid empty: return 0
+#!   rows, cols = dimensions of grid
+#!   count = 0
+#!   define dfs(r, c):
+#!     if r<0 or r>=rows or c<0 or c>=cols or grid[r][c]=='0':
+#!       return
+#!     grid[r][c] = '0'           # sink the land
+#!     dfs(r+1, c)                # down
+#!     dfs(r-1, c)                # up
+#!     dfs(r, c+1)                # right
+#!     dfs(r, c-1)                # left
+#!
+#!   for r in 0..rows-1:
+#!     for c in 0..cols-1:
+#!       if grid[r][c] == '1':
+#!         count += 1
+#!         dfs(r, c)
+#!   return count
+
+def num_islands(grid: list[list[str]]) -> int:
+    if not grid:
+        return 0
+    rows, cols = len(grid), len(grid[0])
+    count = 0
+
+    def dfs(r: int, c: int):
+        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] == '0':
+            return
+        grid[r][c] = '0'            # mark as visited
+        dfs(r+1, c)
+        dfs(r-1, c)
+        dfs(r, c+1)
+        dfs(r, c-1)
+
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == '1':
+                count += 1
+                dfs(r, c)
+    return count
+
+#* Hints:
+#* 1. Use DFS (or BFS) to “sink” each island when you first encounter it.  
+#* 2. Mark visited land as ‘0’ to avoid revisits.  
+#* 3. You visit each cell once → O(m·n) time; recursion stack (or BFS queue) can hold up to m·n cells.  
+#* 4. This pattern is called “flood fill” or “connected components” in a grid.  
