@@ -110,6 +110,75 @@ def length_of_longest_substring(s):
 #* 2. When a duplicate is found within the window, jump left past its previous index.
 #* 3. Store last seen positions in a map to adjust the window in O(1) time.
 # ============================================
+#? 🧠 21. Merge Two Sorted Lists (Easy) – Time: O(n + m), Space: O(1)
+# ============================================
+#* Approach:
+#? We have two sorted linked lists and need to merge them into a single sorted list.
+#? This is similar to the merge step in merge sort: we always pick the smallest current node from either l1 or l2.
+#? To do this efficiently:
+#?   • Use a dummy node as an anchor for the merged list to simplify edge cases.
+#?   • Use a pointer `tail` to build out the new merged list.
+#?   • While both lists are non-empty:
+#?       – Compare l1.val and l2.val.
+#?       – Attach the smaller node to `tail.next`.
+#?       – Advance the pointer in the list we just took from.
+#?       – Move `tail` forward to the newly added node.
+#?   • Once either l1 or l2 is exhausted, attach the remainder of the other list (already sorted) to `tail.next`.
+
+#! Problem:
+#!   Merge two sorted linked lists and return the merged sorted list. 
+#!   The list is built by splicing together the nodes of the input lists.
+#! Example:
+#!   Input: l1 = 1 → 2 → 4, l2 = 1 → 3 → 4
+#!   Output: 1 → 1 → 2 → 3 → 4 → 4
+
+#! Key Idea:
+#!   This is not an alternating weave; it's a pure sorted merge. 
+#!   We always take the smallest current node, regardless of which list it's from, and continue until both lists are fully merged.
+
+#! Pseudocode:
+#!   dummy = ListNode(-1)
+#!   tail = dummy
+#!   while l1 and l2:
+#!       if l1.val < l2.val:
+#!           tail.next = l1
+#!           l1 = l1.next
+#!       else:
+#!           tail.next = l2
+#!           l2 = l2.next
+#!       tail = tail.next
+#!   if l1 or l2:
+#!       tail.next = l1 if l1 else l2
+#!   return dummy.next
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def merge_two_lists(l1, l2):
+    dummy = ListNode(-1)
+    tail = dummy
+
+    while l1 and l2:
+        if l1.val < l2.val:
+            tail.next = l1
+            l1 = l1.next
+        else:
+            tail.next = l2
+            l2 = l2.next
+        tail = tail.next
+
+    tail.next = l1 if l1 else l2
+    return dummy.next
+
+#* Hints:
+#* 1. The dummy node avoids special cases for the head of the list.
+#* 2. This is a pure sorted merge, not an alternating pattern.
+#* 3. We reuse existing nodes; no new nodes are created beyond the dummy.
+#* 4. Time is O(n + m), where n and m are the lengths of l1 and l2. Space is O(1) extra (ignoring output).
+
+# ============================================
 #? 🧠 53. Maximum Subarray (Easy) – Time: O(n), Space: O(1)
 # ============================================
 #* Approach:
@@ -337,6 +406,91 @@ def min_window(s: str, t: str) -> str:
 #* 2. `formed` tracks how many distinct chars have met their target frequency.
 #* 3. Expand the window (right++) until it’s valid, then contract (left++) to find the smallest valid window.
 #* 4. Time is O(|S| + |T|) because each pointer moves at most |S| times; space is O(𝑘), with k distinct chars in T.
+
+# ============================================
+#? 🧠 143. Reorder List (Medium) – Time: O(n), Space: O(1)
+# ============================================
+#* Approach:
+#? This is a 3-step process:
+#? 1️⃣ Find the middle of the linked list (using slow and fast pointers)
+#? 2️⃣ Reverse the second half of the list
+#? 3️⃣ Merge the two halves: one from the start, one from the reversed half
+#
+#! Problem:
+#!   Given a singly linked list: L0 → L1 → … → Ln-1 → Ln,
+#!   reorder it to: L0 → Ln → L1 → Ln-1 → L2 → Ln-2 → …
+#!   You must do this in-place without changing the values of nodes.
+#! Example:
+#!   Input:  1 → 2 → 3 → 4
+#!   Output: 1 → 4 → 2 → 3
+#
+#! Key Idea:
+#!   We can split the list into two halves, reverse the second half,
+#!   then weave the two lists together.
+#
+#! Pseudocode:
+#!   1. Find the middle:
+#!      slow, fast = head
+#!      while fast and fast.next:
+#!          slow = slow.next
+#!          fast = fast.next.next
+#!
+#!   2. Reverse from slow.next onward:
+#!      prev = None
+#!      curr = slow.next
+#!      while curr:
+#!          tmp = curr.next
+#!          curr.next = prev
+#!          prev = curr
+#!          curr = tmp
+#!      slow.next = None
+#!
+#!   3. Merge two halves:
+#!      first = head
+#!      second = prev
+#!      while second:
+#!          tmp1, tmp2 = first.next, second.next
+#!          first.next = second
+#!          second.next = tmp1
+#!          first, second = tmp1, tmp2
+#
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def reorder_list(head):
+    if not head or not head.next:
+        return
+    
+    # 1️⃣ Find the middle
+    slow, fast = head, head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+
+    # 2️⃣ Reverse the second half
+    prev, curr = None, slow.next
+    while curr:
+        tmp = curr.next
+        curr.next = prev
+        prev = curr
+        curr = tmp
+    slow.next = None  # cut off first half
+
+    # 3️⃣ Merge two halves
+    first, second = head, prev
+    while second:
+        tmp1, tmp2 = first.next, second.next
+        first.next = second
+        second.next = tmp1
+        first, second = tmp1, tmp2
+
+#* Hints:
+#* 1. Use slow + fast pointers to split the list in half.
+#* 2. Reverse the second half **in place** to avoid extra space.
+#* 3. Weave the two halves together one node at a time.
+#* 4. Time: O(n) total because each step is O(n). Space: O(1) extra.
 # ============================================
 #? 🧠 198. House Robber (Easy) – Time: O(n), Space: O(1)
 # ============================================
