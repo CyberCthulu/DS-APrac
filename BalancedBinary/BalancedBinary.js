@@ -50,3 +50,36 @@ const dfs = (root) => {
 
   return [1, height];
 };
+
+
+
+// const isBalanced = (root) => {
+//   // The helper dfs() returns [balancedFlag, height]
+//   // balancedFlag: 1 if subtree is balanced, 0 otherwise
+//   // height: height of the current subtree
+//   return dfs(root)[0] === 1;
+// };
+
+// const dfs = (root) => {
+//   // Base case — empty subtree is balanced and has height 0
+//   if (!root) return [1, 0];
+
+//   // Recurse to the leaves first
+//   const left = dfs(root.left);
+//   const right = dfs(root.right);
+
+//   // Check three conditions to confirm balance:
+//   // 1. Left subtree is balanced
+//   // 2. Right subtree is balanced
+//   // 3. Height difference ≤ 1
+//   const balanced =
+//     left[0] === 1 &&
+//     right[0] === 1 &&
+//     Math.abs(left[1] - right[1]) <= 1;
+
+//   // Compute height of this node
+//   const height = 1 + Math.max(left[1], right[1]);
+
+//   // Return [balancedFlag, height]
+//   return [balanced ? 1 : 0, height];
+// };
