@@ -1,0 +1,101 @@
+https://leetcode.com/problems/maximum-depth-of-binary-tree/
+https://neetcode.io/problems/depth-of-binary-tree
+
+Max Depth Binary Tree
+Given the root of a binary tree, return its maximum depth.
+
+A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+
+Example 1:
+
+
+Input: root = [3,9,20,null,null,15,7]
+Output: 3
+
+Example 2:
+Input: root = [1,null,2]
+Output: 2
+
+Constraints:
+The number of nodes in the tree is in the range [0, 104].
+-100 <= Node.val <= 100
+
+
+NODE API:
+.val
+.left
+.right
+
+
+Input: 
+12
+ \
+  3
+   \
+    4
+   / \ 
+  1   2
+ / \
+2   4
+Output: 5
+
+Approach:
+Iterative DFS with a tuple to keep track of current depth
+
+Pseudocode:
+Create a variable for maxDepthSeenSoFar
+Create a stack and put root and current depth in it
+While stack.length:
+pop off current node and its depth
+update the maxDepthSeenSoFar
+push on the child nodes and increment current depth by 1
+Return maxDepthSeenSoFar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Input: 
+12
+ \
+  3
+   \
+    4
+   / \ 
+  1   2
+ / \
+2   4
+Output: 5
+
+const maxDepth = root => {
+	let max = 0; //5
+	if (!root) return max;
+	const startingDepth = 1
+	const stack = [[root, startingDepth]]
+
+	while (stack.length) { //[[2,5]]
+	let [node, depth] = stack.pop(); //[4,5]
+	max = Math.max(max, depth); 
+	if (node.left) stack.push([node.left, depth+1]);
+	if (node.right) stack.push([node.right, depth+1]);
+}
+return max;
+}
